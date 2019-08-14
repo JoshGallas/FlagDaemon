@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
+using System.Net.Sockets;
 
 namespace FlagDaemon.Controller.Environments
 {
@@ -120,13 +122,34 @@ namespace FlagDaemon.Controller.Environments
             throw new NotImplementedException();
         }
 
-        public bool FirewallAllows(int PortNumber)
+        public bool FirewallAllowsTcp(int PortNumber)
+        {
+            //Initialize an IP address to test accompany the PortNumber
+            IPAddress Address = Dns.GetHostAddresses("localhost")[0];
+
+            try {
+                //Create the TCP port Listener
+                TcpListener listener = new TcpListener(Address, PortNumber);
+                
+                //Start the TCP port Listener
+                listener.Start();
+                return true;
+            } catch (SocketException E) {
+                //Port is blocked with inbound TCP connection with ip LocalHost and port PortNumber
+                return false;
+            }
+        }
+
+        public bool FirewallAllowsTcp(int PortNumber, List<string> AllowedIP)
         {
             throw new NotImplementedException();
         }
+        
+        public bool FirewallAllowsUdp(int PortNumber) {
+            throw new NotImplementedException();
+        }
 
-        public bool FirewallAllows(int PortNumber, List<string> AllowedIP)
-        {
+        public bool FireWallAllowsUdp(int PortNumber, List<string> AllowedIP) {
             throw new NotImplementedException();
         }
 

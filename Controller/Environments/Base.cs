@@ -90,11 +90,18 @@ namespace FlagDaemon.Controller.Environments
         // Return true if port is listening (e.g., web server running on correct port)
         Boolean PortListening(int PortNumber);
 
-        // Return true if firewall allows inbound connections to port from any IP
-        Boolean FirewallAllows(int PortNumber);
+        // Return true if firewall allows inbound TCP connections to port from any IP
+        Boolean FirewallAllowsTcp(int PortNumber);
 
-        // Return true if firewall allows inbound connections to port from specific IPs
-        Boolean FirewallAllows(int PortNumber, List<String> AllowedIP);
+        // Return true if firewall allows inbound TCP connections to port from specific IPs
+        Boolean FirewallAllowsTcp(int PortNumber, List<String> AllowedIP);
+
+        // Return true if firewall allows inbound UDP connections to port from any IP
+        Boolean FirewallAllowsUdp(int PortNumber);
+
+        // Return true if firewall allows inbound Udp connections to port from specific IPs
+        Boolean FirewallAllowsUdp(int PortNumber, List<String> AllowedIP);
+
 
         /*
 

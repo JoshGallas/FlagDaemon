@@ -124,17 +124,13 @@ namespace FlagDaemon.Controller.Environments
 
         public bool FirewallAllowsTcp(int PortNumber)
         {
-            //Initialize an IP address to test accompany the PortNumber
-            IPAddress Address = Dns.GetHostAddresses("localhost")[0];
-
             try {
-                //Create the TCP port Listener
-                TcpListener listener = new TcpListener(Address, PortNumber);
-                
-                //Start the TCP port Listener
-                listener.Start();
-                return true;
-            } catch (SocketException E) {
+                //Create a new TCP client with the IP of LocalHost
+               TcpClient client = new TcpClient();
+
+               client.Connect("localhost", PortNumber);
+               return true;
+            } catch (SocketException) {
                 //Port is blocked with inbound TCP connection with ip LocalHost and port PortNumber
                 return false;
             }
@@ -142,15 +138,43 @@ namespace FlagDaemon.Controller.Environments
 
         public bool FirewallAllowsTcp(int PortNumber, List<string> AllowedIP)
         {
-            throw new NotImplementedException();
+            try {
+                //Create a new TCP client
+               TcpClient client = new TcpClient();
+
+                //Connect to ip and port
+               client.Connect(AllowedIP[0], PortNumber);
+               return true;
+            } catch (SocketException) {
+                //Port is blocked with inbound TCP connection with ip index 0 of AllowedIP and port PortNumber
+                return false;
+            }
         }
         
         public bool FirewallAllowsUdp(int PortNumber) {
-            throw new NotImplementedException();
+            try {
+                //Create a new UDP client
+               UdpClient client = new UdpClient();
+
+               client.Connect("localhost", PortNumber);
+               return true;
+            } catch (SocketException) {
+                //Port is blocked with inbound UDP connection with ip LocalHost and port PortNumber
+                return false;
+            }
         }
 
         public bool FirewallAllowsUdp(int PortNumber, List<string> AllowedIP) {
-            throw new NotImplementedException();
+           try {
+                //Create a new UDP client
+               UdpClient client = new UdpClient();
+
+               client.Connect(AllowedIP[0], PortNumber);
+               return true;
+            } catch (SocketException) {
+                //Port is blocked with inbound UDP connection with ip index 0 of AllowedIP and port PortNumber
+                return false;
+            }
         }
 
         public Dictionary<string, string> GetPolicy(string PolicyName)

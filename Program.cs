@@ -47,9 +47,6 @@ namespace FlagDaemon
                 Console.WriteLine("Port 8543 is open for TCP connections!");
             else 
                 Console.WriteLine("Port 8543 is not open for TCP connections...");
-            
-
-
         }
     }
 }

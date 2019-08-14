@@ -12,6 +12,7 @@ namespace FlagDaemon.Controller.Environments
         */
         
         public bool HasFile(string FilePath) => File.Exists(FilePath); // Fancy lambda-style definition (via System.IO.File)
+
         public bool CreateFile(string FilePath, byte[] FileContents)
         {
             try {
@@ -40,20 +41,71 @@ namespace FlagDaemon.Controller.Environments
             }
         }
 
-
-        // Not implemented yet
-        public bool CreateFile(string FilePath, string SourcePath)
-        {
-            throw new NotImplementedException();
-        }
-
-
         public bool CreateFile(string FilePath, string[] FileContents)
         {
-            throw new NotImplementedException();
+            try {
+
+                // Open file for writing
+                //Use BinaryWriter for In-Memory representation of contents
+                BinaryWriter FileHandle = new BinaryWriter(File.Open(FilePath, FileMode.OpenOrCreate));
+                
+                // Write each content to file
+                foreach(var item in FileContents) {
+                    FileHandle.Write(item);
+                }
+
+                // Clean up
+                FileHandle.Flush();
+                FileHandle.Close();
+
+                // Return success
+                return true;
+
+            } catch (Exception e) {
+
+                System.Console.WriteLine(String.Format(
+                    "Received error '{0}'",
+                    e.ToString()
+                ));
+                return false;
+
+            }
         }
 
         public bool CreateFile(string FilePath, List<string> FileContents)
+        {
+            try {
+
+                // Open file for writing
+                //Use BinaryWriter for In-Memory representation of contents
+                BinaryWriter FileHandle = new BinaryWriter(File.Open(FilePath, FileMode.OpenOrCreate));
+
+                // Write each content to file
+                foreach(var item in FileContents) {
+                    FileHandle.Write(item);
+                }
+
+                // Clean up
+                FileHandle.Flush();
+                FileHandle.Close();
+
+                // Return success
+                return true;
+
+            } catch (Exception e) {
+
+                System.Console.WriteLine(String.Format(
+                    "Received error '{0}'",
+                    e.ToString()
+                ));
+                return false;
+
+            }
+        }
+
+
+        // Not implemented yet
+        public bool CreateFile(string FilePath, string SourcePath)
         {
             throw new NotImplementedException();
         }

@@ -1,0 +1,6 @@
+
+*.csproj
+
+obj/Debug/netcoreapp3.0/FlagDaemon.AssemblyInfo.cs
+
+*.cache

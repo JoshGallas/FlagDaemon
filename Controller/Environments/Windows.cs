@@ -149,7 +149,7 @@ namespace FlagDaemon.Controller.Environments
             throw new NotImplementedException();
         }
 
-        public bool FireWallAllowsUdp(int PortNumber, List<string> AllowedIP) {
+        public bool FirewallAllowsUdp(int PortNumber, List<string> AllowedIP) {
             throw new NotImplementedException();
         }
 

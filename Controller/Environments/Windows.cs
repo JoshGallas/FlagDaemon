@@ -14,7 +14,14 @@ namespace FlagDaemon.Controller.Environments
         // Map 'universal' policy name to WMI short name (left side = same for win/nix, right-size = WMI short name from API.WMI)
         private Dictionary<String,String> PolicyMappings = new Dictionary<String,String> {
             {"password-complexity", "PasswordComplexity"},
-            {"lockout-duration", "LockoutDuration"},
+            {"password-store-cleartext", "ClearTextPassword"},
+            {"password-age-max", "MaximumPasswordAge"},
+            {"password-age-min", "MinimumPasswordAge"},
+            {"password-age-history", "PasswordHistorySize"},
+            {"password-length-min", "MinimumPasswordLength"},
+            {"account-lockout-duration", "LockoutDuration"},
+            {"account-lockout-reset", "ResetLockoutCount"},
+            {"account-lockout-threshold", "LockoutBadCount"}
         };
 
         /*

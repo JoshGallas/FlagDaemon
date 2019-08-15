@@ -59,17 +59,34 @@ namespace FlagDaemon
             // This only works as administrator (i.e., run a cmd prompt as admin and then execute FlagDaemon.exe from bin\Debug\netcoreapp3.0)
 
             try {
-                
+
                 System.Console.WriteLine(
                     String.Format(
-                        "Password Complexity: '{0}'",
-                        WindowsInterface.GetPolicy("password-complexity")["Value"]
+                        "Cleartext password storage: '{0}'",
+                        WindowsInterface.GetPolicy("password-store-cleartext")["Value"]
                     )
                 );
                 System.Console.WriteLine(
                     String.Format(
-                        "Lockout duration: '{0}'",
-                        WindowsInterface.GetPolicy("lockout-duration")["Value"]
+                        "Password Complexity: '{0}', with minimum length '{1}'",
+                        WindowsInterface.GetPolicy("password-complexity")["Value"],
+                        WindowsInterface.GetPolicy("password-length-min")["Value"]
+                    )
+                );
+                System.Console.WriteLine(
+                    String.Format(
+                        "Lockout duration: '{0}' after '{1}' bad attempts, reset attempts after '{2}'",
+                        WindowsInterface.GetPolicy("account-lockout-duration")["Value"],
+                        WindowsInterface.GetPolicy("account-lockout-threshold")["Value"],
+                        WindowsInterface.GetPolicy("account-lockout-reset")["Value"]
+                    )
+                );
+                System.Console.WriteLine(
+                    String.Format(
+                        "Password Age Range: '{0}-{1}', history of '{2}'",
+                        WindowsInterface.GetPolicy("password-age-min")["Value"],
+                        WindowsInterface.GetPolicy("password-age-max")["Value"],
+                        WindowsInterface.GetPolicy("password-age-history")["Value"]
                     )
                 );
 

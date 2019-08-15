@@ -2,4 +2,6 @@ obj/*
 
 *.cache
 
+.git
+
 bin/

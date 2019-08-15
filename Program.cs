@@ -63,30 +63,43 @@ namespace FlagDaemon
                 System.Console.WriteLine(
                     String.Format(
                         "Cleartext password storage: '{0}'",
-                        WindowsInterface.GetPolicy("password-store-cleartext")["Value"]
+                        WindowsInterface.GetPolicy("password-store-cleartext")["Setting"]
                     )
                 );
                 System.Console.WriteLine(
                     String.Format(
                         "Password Complexity: '{0}', with minimum length '{1}'",
-                        WindowsInterface.GetPolicy("password-complexity")["Value"],
-                        WindowsInterface.GetPolicy("password-length-min")["Value"]
+                        WindowsInterface.GetPolicy("password-complexity")["Setting"],
+                        WindowsInterface.GetPolicy("password-length-min")["Setting"]
                     )
                 );
                 System.Console.WriteLine(
                     String.Format(
                         "Lockout duration: '{0}' after '{1}' bad attempts, reset attempts after '{2}'",
-                        WindowsInterface.GetPolicy("account-lockout-duration")["Value"],
-                        WindowsInterface.GetPolicy("account-lockout-threshold")["Value"],
-                        WindowsInterface.GetPolicy("account-lockout-reset")["Value"]
+                        WindowsInterface.GetPolicy("account-lockout-duration")["Setting"],
+                        WindowsInterface.GetPolicy("account-lockout-threshold")["Setting"],
+                        WindowsInterface.GetPolicy("account-lockout-reset")["Setting"]
                     )
                 );
                 System.Console.WriteLine(
                     String.Format(
                         "Password Age Range: '{0}-{1}', history of '{2}'",
-                        WindowsInterface.GetPolicy("password-age-min")["Value"],
-                        WindowsInterface.GetPolicy("password-age-max")["Value"],
-                        WindowsInterface.GetPolicy("password-age-history")["Value"]
+                        WindowsInterface.GetPolicy("password-age-min")["Setting"],
+                        WindowsInterface.GetPolicy("password-age-max")["Setting"],
+                        WindowsInterface.GetPolicy("password-age-history")["Setting"]
+                    )
+                );
+                System.Console.WriteLine(
+                    String.Format(
+                        "Login notice: '{0}'",
+                        WindowsInterface.GetPolicy("account-login-notice")["Data"]
+                    )
+                );
+                System.Console.WriteLine(
+                    String.Format(
+                        "Audit logon: success='{0}', failure='{1}'",
+                        WindowsInterface.GetPolicy("audit-logon-events")["Success"],
+                        WindowsInterface.GetPolicy("audit-logon-events")["Failure"]
                     )
                 );
 

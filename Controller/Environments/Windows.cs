@@ -21,7 +21,9 @@ namespace FlagDaemon.Controller.Environments
             {"password-length-min", "MinimumPasswordLength"},
             {"account-lockout-duration", "LockoutDuration"},
             {"account-lockout-reset", "ResetLockoutCount"},
-            {"account-lockout-threshold", "LockoutBadCount"}
+            {"account-lockout-threshold", "LockoutBadCount"},
+            {"audit-logon-events", "AuditLogonEvents"},
+            {"account-login-notice","REG_LogonNotice"}
         };
 
         /*
@@ -127,18 +129,7 @@ namespace FlagDaemon.Controller.Environments
 
             }
         }
-        public Dictionary<string, string> GetPolicy(string PolicyName)
-        {
-            return new Dictionary<String,String> {
-                {
-                    "Value",
-                    API.WMI.QueryRSOPPolicyByName(
-                        this.PolicyMappings[PolicyName]
-                    )
-                }
-            };
-        }
-
+        public Dictionary<string, string> GetPolicy(string PolicyName) => API.WMI.QueryRSOPPolicyByName(this.PolicyMappings[PolicyName]).Data;
 
         // Not implemented yet
         public bool CreateFile(string FilePath, string SourcePath)

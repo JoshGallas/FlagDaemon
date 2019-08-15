@@ -3,11 +3,27 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Management;
 
 namespace FlagDaemon.Controller.Environments
 {
     public class Windows : FlagDaemon.Controller.Environments.Base
     {
+
+
+        // Map 'universal' policy name to WMI short name (left side = same for win/nix, right-size = WMI short name from API.WMI)
+        private Dictionary<String,String> PolicyMappings = new Dictionary<String,String> {
+            {"password-complexity", "PasswordComplexity"},
+            {"lockout-duration", "LockoutDuration"},
+        };
+
+        /*
+        
+         Methods specific to Windows
+        
+        */
+
+    
 
         /*
          Implemented methods
@@ -104,6 +120,17 @@ namespace FlagDaemon.Controller.Environments
 
             }
         }
+        public Dictionary<string, string> GetPolicy(string PolicyName)
+        {
+            return new Dictionary<String,String> {
+                {
+                    "Value",
+                    API.WMI.QueryRSOPPolicyByName(
+                        this.PolicyMappings[PolicyName]
+                    )
+                }
+            };
+        }
 
 
         // Not implemented yet
@@ -176,12 +203,6 @@ namespace FlagDaemon.Controller.Environments
                 return false;
             }
         }
-
-        public Dictionary<string, string> GetPolicy(string PolicyName)
-        {
-            throw new NotImplementedException();
-        }
-
 
         public bool HasPolicy(string PolicyName)
         {

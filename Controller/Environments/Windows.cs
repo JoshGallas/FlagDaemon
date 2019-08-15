@@ -4,6 +4,8 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Management;
+using WindowsFirewallHelper;
+using System.Linq;
 
 namespace FlagDaemon.Controller.Environments
 {
@@ -156,21 +158,23 @@ namespace FlagDaemon.Controller.Environments
             throw new NotImplementedException();
         }
 
-        public bool FirewallAllowsTcp(int PortNumber)
+        public bool FirewallAllowsTcp(ushort PortNumber)
         {
-            try {
-                //Create a new TCP client with the IP of LocalHost
-               TcpClient client = new TcpClient();
-
-               client.Connect("localhost", PortNumber);
-               return true;
-            } catch (SocketException) {
-                //Port is blocked with inbound TCP connection with ip LocalHost and port PortNumber
-                return false;
+            foreach(var rule in FirewallManager.Instance.Rules) 
+            {
+                //Check if it is ports being added to the firewall rule and with rule contains the port number
+                if(rule.LocalPorts.Length >= 1 && rule.LocalPorts.Contains(PortNumber)) {
+                    //Check if everything is the correct credentials
+                    if(rule.Protocol.Equals(FirewallProtocol.TCP) && rule.IsEnable && rule.Action.Equals(FirewallAction.Allow))
+                    {
+                        return true;
+                    }
+                }
             }
+            return false;
         }
 
-        public bool FirewallAllowsTcp(int PortNumber, List<string> AllowedIP)
+        public bool FirewallAllowsTcp(ushort PortNumber, List<string> AllowedIP)
         {
             try {
                 //Create a new TCP client
@@ -185,20 +189,22 @@ namespace FlagDaemon.Controller.Environments
             }
         }
         
-        public bool FirewallAllowsUdp(int PortNumber) {
-            try {
-                //Create a new UDP client
-               UdpClient client = new UdpClient();
-
-               client.Connect("localhost", PortNumber);
-               return true;
-            } catch (SocketException) {
-                //Port is blocked with inbound UDP connection with ip LocalHost and port PortNumber
-                return false;
+        public bool FirewallAllowsUdp(ushort PortNumber) {
+             foreach(var rule in FirewallManager.Instance.Rules) 
+            {
+                //Check if it is ports being added to the firewall rule and with rule contains the port number
+                if(rule.LocalPorts.Length >= 1 && rule.LocalPorts.Contains(PortNumber)) {
+                    //Check if everything is the correct credentials
+                    if(rule.Protocol.Equals(FirewallProtocol.UDP) && rule.IsEnable && rule.Action.Equals(FirewallAction.Allow))
+                    {
+                        return true;
+                    }
+                }
             }
+            return false;
         }
 
-        public bool FirewallAllowsUdp(int PortNumber, List<string> AllowedIP) {
+        public bool FirewallAllowsUdp(ushort PortNumber, List<string> AllowedIP) {
            try {
                 //Create a new UDP client
                UdpClient client = new UdpClient();

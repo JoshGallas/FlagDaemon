@@ -137,96 +137,84 @@ namespace FlagDaemon.Controller.Environments
         /*
             Firewall Methods
          */
-        public bool FirewallAllowsTcp(ushort PortNumber)
-        {
-            foreach(var rule in FirewallManager.Instance.Rules) 
-            {
-                //Check if it is ports being added to the firewall rule and with rule contains the port number
-                if(rule.LocalPorts.Length >= 1 && rule.LocalPorts.Contains(PortNumber)) {
-                    //Check if everything is the correct credentials
-                    if(rule.Protocol.Equals(FirewallProtocol.TCP) && rule.IsEnable && rule.Action.Equals(FirewallAction.Allow))
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
+
+        // Did a little abstraction
+        private IEnumerable<IFirewallRule> FindMatchingFirewallRules(ushort PortNumber, FirewallProtocol RuleProtocol) {
+
+            // System.Linq ftw
+            IEnumerable<IFirewallRule> Matched = FirewallManager.Instance.Rules.Where(
+                Rule => Rule.LocalPorts.Contains(PortNumber) &&
+                        Rule.Protocol.Equals(RuleProtocol)
+            );
+
+            return Matched;
+
         }
+
+        private IEnumerable<IFirewallRule> GetFirewallTCPRuleByAction(ushort PortNumber, FirewallAction RuleAction) {
+
+            return this.FindMatchingFirewallRules(PortNumber, FirewallProtocol.TCP).Where(Rule => Rule.IsEnable && Rule.Action.Equals(RuleAction));
+
+        }
+        private IEnumerable<IFirewallRule> GetFirewallUDPRuleByAction(ushort PortNumber, FirewallAction RuleAction) {
+
+            return this.FindMatchingFirewallRules(PortNumber, FirewallProtocol.UDP).Where(Rule => Rule.IsEnable && Rule.Action.Equals(RuleAction));
+
+        }
+
+        public bool FirewallAllowsTcp(ushort PortNumber) {
+
+            IEnumerable<IFirewallRule> MatchedRules = this.GetFirewallTCPRuleByAction(PortNumber, FirewallAction.Allow);
+            return (MatchedRules != null) && (MatchedRules.ToArray().Length > 0);
+
+        } 
 
         public bool FirewallAllowsTcp(ushort PortNumber, List<string> AllowedIP)
         {
-           foreach(var rule in FirewallManager.Instance.Rules) 
-            {
-                //Check if it is ports being added to the firewall rule and with rule contains the port number
-                if(rule.LocalPorts.Length >= 1 && rule.LocalPorts.Contains(PortNumber)) {
-                    //Check if everything is the correct credentials
-                    if(rule.Protocol.Equals(FirewallProtocol.TCP) && rule.IsEnable && rule.Action.Equals(FirewallAction.Allow))
-                    {    
-                        foreach(var NeededAddress in AllowedIP) 
-                        {
-                            foreach(var ContainedAddress in rule.RemoteAddresses) 
-                            {
-                                //Super cheeky way of reverse working through the Remote Addresses
-                                if(NeededAddress.Equals(ContainedAddress.ToString()))
-                                    goto FirstLoop;
-                            }
-                            //If the Remote Addresses do not contain the IP needed, it will return false here
-                            return false;
 
-                            FirstLoop:
-                            continue;
-                        }
-                        //At this point all needed addresses were inside of the remote addresses and we can move on
-                        return true;
-                    }
-                }
-            }
-            return false;
+            // Hit count for matched IPs
+            int i = 0;
+
+            // For each rule allowing inbound TCP on a port
+            foreach(IFirewallRule rule in this.GetFirewallTCPRuleByAction(PortNumber, FirewallAction.Allow))
+                // Check if IP match
+                foreach (IAddress ConfiguredAddress in rule.RemoteAddresses) 
+                    // If it allows an IP we didn't request, fail here
+                    if (! AllowedIP.Contains(ConfiguredAddress.ToString()))
+                        return false;
+                    else // Otherwise, note that we found a new match
+                        i++;
+
+            // Return true only if there exists a single matching inbound firewall rule which has exactly the same port and remote address list as in parameters
+            return i == AllowedIP.Count();
+
         }
         
         public bool FirewallAllowsUdp(ushort PortNumber) {
-             foreach(var rule in FirewallManager.Instance.Rules) 
-            {
-                //Check if it is ports being added to the firewall rule and with rule contains the port number
-                if(rule.LocalPorts.Length >= 1 && rule.LocalPorts.Contains(PortNumber)) {
-                    //Check if everything is the correct credentials
-                    if(rule.Protocol.Equals(FirewallProtocol.UDP) && rule.IsEnable && rule.Action.Equals(FirewallAction.Allow))
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
+
+            IEnumerable<IFirewallRule> MatchedRules = this.GetFirewallUDPRuleByAction(PortNumber, FirewallAction.Allow);
+            return (MatchedRules != null) && (MatchedRules.ToArray().Length > 0);
+
+        } 
 
         public bool FirewallAllowsUdp(ushort PortNumber, List<string> AllowedIP) {
-           foreach(var rule in FirewallManager.Instance.Rules) 
-            {
-                //Check if it is ports being added to the firewall rule and with rule contains the port number
-                if(rule.LocalPorts.Length >= 1 && rule.LocalPorts.Contains(PortNumber)) {
-                    //Check if everything is the correct credentials
-                    if(rule.Protocol.Equals(FirewallProtocol.UDP) && rule.IsEnable && rule.Action.Equals(FirewallAction.Allow))
-                    {    
-                        foreach(var NeededAddress in AllowedIP) 
-                        {
-                            foreach(var ContainedAddress in rule.RemoteAddresses) 
-                            {
-                                //Super cheeky way of reverse working through the Remote Addresses
-                                if(NeededAddress.Equals(ContainedAddress.ToString()))
-                                    goto FirstLoop;
-                            }
-                            //If the Remote Addresses do not contain the IP needed, it will return false here
-                            return false;
 
-                            FirstLoop:
-                            continue;
-                        }
-                        //At this point all needed addresses were inside of the remote addresses and we can move on
-                        return true;
-                    }
-                }
-            }
-            return false;
+            // Hit count for matched IPs
+            int i = 0;
+
+            // For each rule allowing inbound TCP on a port
+            foreach(IFirewallRule rule in this.GetFirewallUDPRuleByAction(PortNumber, FirewallAction.Allow))
+                // Check if IP match
+                foreach (IAddress ConfiguredAddress in rule.RemoteAddresses)
+                    // If it allows an IP we didn't request, fail here
+                    if (! AllowedIP.Contains(ConfiguredAddress.ToString()))
+                        return false;
+                    else // Otherwise, note that we found a new match
+                        i++;
+
+            // Return true only if there exists a single matching inbound firewall rule which has exactly the same port and remote address list as in parameters
+            return i == AllowedIP.Count();
+
         }
 
 

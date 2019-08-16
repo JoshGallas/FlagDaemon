@@ -44,12 +44,42 @@ namespace FlagDaemon
                 Console.WriteLine("Unable to create test.txt...");
 
             //Test to see if TCP port 8543 is open for any connection
-            string[] allowed = {"174.184.146.248", "86.178.106.18"};
-            List<string> AllowedIP = allowed.OfType<string>().ToList();
-            if (WindowsInterface.FirewallAllowsTcp(8543, AllowedIP))
-                Console.WriteLine("Port 8543 is open for TCP connections!");
+            List<string> AllowedIP = new List<string> {"174.184.146.248", "86.178.106.18"};
+            if (WindowsInterface.FirewallAllowsTcp(80, AllowedIP))
+                Console.WriteLine("Port 80 is open for TCP connections!");
             else 
-                Console.WriteLine("Port 8543 is not open for TCP connections...");
+                Console.WriteLine("Port 80 is not open for TCP connections...");
+
+            if (WindowsInterface.FirewallAllowsTcp(3389))
+                Console.WriteLine("Port 3389 is open for TCP connections!");
+            else 
+                Console.WriteLine("Port 3389 is not open for TCP connections...");
+
+            if (WindowsInterface.FirewallAllowsTcp(445))
+                Console.WriteLine("Port 445 is open for TCP connections!");
+            else 
+                Console.WriteLine("Port 445 is not open for TCP connections...");
+
+            if (WindowsInterface.FirewallAllowsTcp(445, new List<string>()))
+                Console.WriteLine("Port 445 is open for TCP connections from ANY address!!");
+            else 
+                Console.WriteLine("Port 445 is not open for TCP connections from ANY address!!...");
+
+            if (WindowsInterface.FirewallAllowsTcp(6667))
+                Console.WriteLine("Port 6667 is open for TCP connections!");
+            else 
+                Console.WriteLine("Port 6667 is not open for TCP connections...");
+
+            if (WindowsInterface.FirewallAllowsTcp(6667, new List<String> {"8.8.8.8"}))
+                Console.WriteLine("Port 6667 is open for TCP connections from 8.8.8.8!");
+            else 
+                Console.WriteLine("Port 6667 is not open for TCP connections from 8.8.8.8...");
+
+            if (WindowsInterface.FirewallAllowsTcp(6667, new List<String> {"127.0.0.1"}))
+                Console.WriteLine("Port 6667 is open for TCP connections from 127.0.0.1!");
+            else 
+                Console.WriteLine("Port 6667 is not open for TCP connections from 127.0.0.1...");
+
 
             /*
             

@@ -139,28 +139,21 @@ namespace FlagDaemon.Controller.Environments
          */
 
         // Did a little abstraction
-        private IEnumerable<IFirewallRule> FindMatchingFirewallRules(ushort PortNumber, FirewallProtocol RuleProtocol) {
-
-            // System.Linq ftw
-            IEnumerable<IFirewallRule> Matched = FirewallManager.Instance.Rules.Where(
+        private IEnumerable<IFirewallRule> FindMatchingFirewallRules(ushort PortNumber, FirewallProtocol RuleProtocol) => 
+            FirewallManager.Instance.Rules.Where(
                 Rule => Rule.LocalPorts.Contains(PortNumber) &&
                         Rule.Protocol.Equals(RuleProtocol)
             );
 
-            return Matched;
+        private IEnumerable<IFirewallRule> GetFirewallTCPRuleByAction(ushort PortNumber, FirewallAction RuleAction) => 
+            this.FindMatchingFirewallRules(PortNumber, FirewallProtocol.TCP).Where(
+                Rule => Rule.IsEnable && Rule.Action.Equals(RuleAction)
+            );
 
-        }
-
-        private IEnumerable<IFirewallRule> GetFirewallTCPRuleByAction(ushort PortNumber, FirewallAction RuleAction) {
-
-            return this.FindMatchingFirewallRules(PortNumber, FirewallProtocol.TCP).Where(Rule => Rule.IsEnable && Rule.Action.Equals(RuleAction));
-
-        }
-        private IEnumerable<IFirewallRule> GetFirewallUDPRuleByAction(ushort PortNumber, FirewallAction RuleAction) {
-
-            return this.FindMatchingFirewallRules(PortNumber, FirewallProtocol.UDP).Where(Rule => Rule.IsEnable && Rule.Action.Equals(RuleAction));
-
-        }
+        private IEnumerable<IFirewallRule> GetFirewallUDPRuleByAction(ushort PortNumber, FirewallAction RuleAction) =>
+            this.FindMatchingFirewallRules(PortNumber, FirewallProtocol.UDP).Where(
+                Rule => Rule.IsEnable && Rule.Action.Equals(RuleAction)
+            );
 
         public bool FirewallAllowsTcp(ushort PortNumber) {
 

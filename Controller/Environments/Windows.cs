@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Management;
 using WindowsFirewallHelper;
 using System.Linq;
+using System.Text;
 
 namespace FlagDaemon.Controller.Environments
 {
@@ -133,22 +134,9 @@ namespace FlagDaemon.Controller.Environments
         }
         public Dictionary<string, string> GetPolicy(string PolicyName) => API.WMI.QueryRSOPPolicyByName(this.PolicyMappings[PolicyName]).Data;
 
-        // Not implemented yet
-        public bool CreateFile(string FilePath, string SourcePath)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool EnableService(string ServiceName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool FileContains(string FilePath, int LineNumber, string FlagSubstring)
-        {
-            throw new NotImplementedException();
-        }
-
+        /*
+            Firewall Methods
+         */
         public bool FirewallAllowsTcp(ushort PortNumber)
         {
             foreach(var rule in FirewallManager.Instance.Rules) 
@@ -167,17 +155,33 @@ namespace FlagDaemon.Controller.Environments
 
         public bool FirewallAllowsTcp(ushort PortNumber, List<string> AllowedIP)
         {
-            try {
-                //Create a new TCP client
-               TcpClient client = new TcpClient();
+           foreach(var rule in FirewallManager.Instance.Rules) 
+            {
+                //Check if it is ports being added to the firewall rule and with rule contains the port number
+                if(rule.LocalPorts.Length >= 1 && rule.LocalPorts.Contains(PortNumber)) {
+                    //Check if everything is the correct credentials
+                    if(rule.Protocol.Equals(FirewallProtocol.TCP) && rule.IsEnable && rule.Action.Equals(FirewallAction.Allow))
+                    {    
+                        foreach(var NeededAddress in AllowedIP) 
+                        {
+                            foreach(var ContainedAddress in rule.RemoteAddresses) 
+                            {
+                                //Super cheeky way of reverse working through the Remote Addresses
+                                if(NeededAddress.Equals(ContainedAddress.ToString()))
+                                    goto FirstLoop;
+                            }
+                            //If the Remote Addresses do not contain the IP needed, it will return false here
+                            return false;
 
-                //Connect to ip and port
-               client.Connect(AllowedIP[0], PortNumber);
-               return true;
-            } catch (SocketException) {
-                //Port is blocked with inbound TCP connection with ip index 0 of AllowedIP and port PortNumber
-                return false;
+                            FirstLoop:
+                            continue;
+                        }
+                        //At this point all needed addresses were inside of the remote addresses and we can move on
+                        return true;
+                    }
+                }
             }
+            return false;
         }
         
         public bool FirewallAllowsUdp(ushort PortNumber) {
@@ -196,16 +200,50 @@ namespace FlagDaemon.Controller.Environments
         }
 
         public bool FirewallAllowsUdp(ushort PortNumber, List<string> AllowedIP) {
-           try {
-                //Create a new UDP client
-               UdpClient client = new UdpClient();
+           foreach(var rule in FirewallManager.Instance.Rules) 
+            {
+                //Check if it is ports being added to the firewall rule and with rule contains the port number
+                if(rule.LocalPorts.Length >= 1 && rule.LocalPorts.Contains(PortNumber)) {
+                    //Check if everything is the correct credentials
+                    if(rule.Protocol.Equals(FirewallProtocol.UDP) && rule.IsEnable && rule.Action.Equals(FirewallAction.Allow))
+                    {    
+                        foreach(var NeededAddress in AllowedIP) 
+                        {
+                            foreach(var ContainedAddress in rule.RemoteAddresses) 
+                            {
+                                //Super cheeky way of reverse working through the Remote Addresses
+                                if(NeededAddress.Equals(ContainedAddress.ToString()))
+                                    goto FirstLoop;
+                            }
+                            //If the Remote Addresses do not contain the IP needed, it will return false here
+                            return false;
 
-               client.Connect(AllowedIP[0], PortNumber);
-               return true;
-            } catch (SocketException) {
-                //Port is blocked with inbound UDP connection with ip index 0 of AllowedIP and port PortNumber
-                return false;
+                            FirstLoop:
+                            continue;
+                        }
+                        //At this point all needed addresses were inside of the remote addresses and we can move on
+                        return true;
+                    }
+                }
             }
+            return false;
+        }
+
+
+        // Not implemented yet
+        public bool CreateFile(string FilePath, string SourcePath)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool EnableService(string ServiceName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool FileContains(string FilePath, int LineNumber, string FlagSubstring)
+        {
+            throw new NotImplementedException();
         }
 
         public bool HasPolicy(string PolicyName)

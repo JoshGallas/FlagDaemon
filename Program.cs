@@ -2,7 +2,7 @@
 using System.Text;
 using System.Management;
 using System.Collections.Generic;
-
+using System.Linq;
 namespace FlagDaemon
 {
     class Program
@@ -44,8 +44,9 @@ namespace FlagDaemon
                 Console.WriteLine("Unable to create test.txt...");
 
             //Test to see if TCP port 8543 is open for any connection
-
-            if (WindowsInterface.FirewallAllowsTcp(8543))
+            string[] allowed = {"174.184.146.248", "86.178.106.18"};
+            List<string> AllowedIP = allowed.OfType<string>().ToList();
+            if (WindowsInterface.FirewallAllowsTcp(8543, AllowedIP))
                 Console.WriteLine("Port 8543 is open for TCP connections!");
             else 
                 Console.WriteLine("Port 8543 is not open for TCP connections...");

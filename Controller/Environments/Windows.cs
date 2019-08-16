@@ -165,7 +165,7 @@ namespace FlagDaemon.Controller.Environments
         public bool FirewallAllowsTcp(ushort PortNumber) {
 
             IEnumerable<IFirewallRule> MatchedRules = this.GetFirewallTCPRuleByAction(PortNumber, FirewallAction.Allow);
-            return (MatchedRules != null) && (MatchedRules.ToArray().Length > 0);
+            return (MatchedRules != null) && (MatchedRules.Count() > 0);
 
         } 
 
@@ -193,7 +193,7 @@ namespace FlagDaemon.Controller.Environments
         public bool FirewallAllowsUdp(ushort PortNumber) {
 
             IEnumerable<IFirewallRule> MatchedRules = this.GetFirewallUDPRuleByAction(PortNumber, FirewallAction.Allow);
-            return (MatchedRules != null) && (MatchedRules.ToArray().Length > 0);
+            return (MatchedRules != null) && (MatchedRules.Count() > 0);
 
         } 
 
